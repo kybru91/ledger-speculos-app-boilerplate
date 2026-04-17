@@ -40,7 +40,7 @@ def verify_name(name: str) -> None:
         if info:
             dinfo = info.groupdict()
             name_str = dinfo["val"]
-    assert name == name_str
+    assert name_str == name, f"Expected name {name_str!r}, got {name!r}"
 
 
 def verify_version(version: str) -> None:
