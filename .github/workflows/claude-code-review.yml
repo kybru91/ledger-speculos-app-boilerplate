@@ -46,8 +46,8 @@ jobs:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           plugin_marketplaces: 'https://github.com/anthropics/claude-code.git'
           plugins: 'code-review@claude-code-plugins'
-          prompt: './github/instructions/REVIEW.instructions.md'
-          claude_args: '--model claude-opus-4.6'
+          prompt: './.github/instructions/REVIEW.instructions.md'
+          claude_args: '--model claude-opus-4-6'
           # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
           # or https://code.claude.com/docs/en/cli-reference for available options
 
