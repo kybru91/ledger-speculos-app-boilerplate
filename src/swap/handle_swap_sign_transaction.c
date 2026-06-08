@@ -32,7 +32,7 @@ static bool is_token_swap(void) {
             G_swap_validated.decimals != EXPONENT_SMALLEST_UNIT);
 }
 
-bool swap_copy_transaction_parameters(create_transaction_parameters_t* params) {
+bool swap_copy_transaction_parameters(create_transaction_parameters_t *params) {
     PRINTF("Inside swap_copy_transaction_parameters\n");
 
     if (params->destination_address == NULL) {
@@ -119,8 +119,8 @@ bool swap_copy_transaction_parameters(create_transaction_parameters_t* params) {
 /* Check if the Tx to sign have the same parameters as the ones previously validated */
 bool swap_check_validity(uint64_t amount,
                          uint64_t fee,
-                         const uint8_t* destination,
-                         const token_info_t* token_info) {
+                         const uint8_t *destination,
+                         const token_info_t *token_info) {
     PRINTF("Inside swap_check_validity\n");
 
     if (!G_swap_validated.initialized) {
