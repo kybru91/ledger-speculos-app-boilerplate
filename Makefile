@@ -137,7 +137,7 @@ ENABLE_PKI_LIBRARY = 1
 ########################################
 #        Stack protection features     #
 ########################################
-ENABLE_STACK_PROTECTOR=1
+ENABLE_STACK_PROTECTOR = 1
 
 ########################################
 #          Features disablers          #
