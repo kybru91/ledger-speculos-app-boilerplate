@@ -1,12 +1,16 @@
 import pytest
-
-from ragger.bip import calculate_public_key_and_chaincode, CurveChoice
-from ragger.error import ExceptionRAPDU
 from ragger.backend.interface import BackendInterface
+from ragger.bip import CurveChoice, calculate_public_key_and_chaincode
+from ragger.error import ExceptionRAPDU
 from ragger.navigator.navigation_scenario import NavigateWithScenario
 
-from application_client.boilerplate_command_sender import BoilerplateCommandSender, Errors
-from application_client.boilerplate_response_unpacker import unpack_get_public_key_response
+from application_client.boilerplate_command_sender import (
+    BoilerplateCommandSender,
+    Errors,
+)
+from application_client.boilerplate_response_unpacker import (
+    unpack_get_public_key_response,
+)
 
 
 # In this test we check that the GET_PUBLIC_KEY works in non-confirmation mode
@@ -16,7 +20,7 @@ def test_get_public_key_no_confirm(backend: BackendInterface) -> None:
         "m/44'/1'/0/0/0",
         "m/44'/1'/911'/0/0",
         "m/44'/1'/255/255/255",
-        "m/44'/1'/2147483647/0/0/0/0/0/0/0"
+        "m/44'/1'/2147483647/0/0/0/0/0/0/0",
     ]
     for path in path_list:
         client = BoilerplateCommandSender(backend)

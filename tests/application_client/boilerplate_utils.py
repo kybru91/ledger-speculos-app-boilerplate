@@ -1,6 +1,5 @@
 from io import BytesIO
-from typing import Optional, Literal, Union
-
+from typing import Literal
 
 UINT64_MAX: int = 2**64 - 1
 UINT32_MAX: int = 2**32 - 1
@@ -23,7 +22,7 @@ def write_varint(n: int) -> bytes:
     raise ValueError(f"Can't write to varint: '{n}'!")
 
 
-def read_varint(buf: BytesIO, prefix: Optional[bytes] = None) -> int:
+def read_varint(buf: BytesIO, prefix: bytes | None = None) -> int:
     b: bytes = prefix if prefix else buf.read(1)
 
     if not b:
@@ -48,9 +47,7 @@ def read(buf: BytesIO, size: int) -> bytes:
     return b
 
 
-def read_uint(
-    buf: BytesIO, bit_len: int, byteorder: Literal["big", "little"] = "little"
-) -> int:
+def read_uint(buf: BytesIO, bit_len: int, byteorder: Literal["big", "little"] = "little") -> int:
     size: int = bit_len // 8
     b: bytes = buf.read(size)
 
@@ -60,7 +57,7 @@ def read_uint(
     return int.from_bytes(b, byteorder)
 
 
-def parse_hex_address(address: Union[str, bytes]) -> bytes:
+def parse_hex_address(address: str | bytes) -> bytes:
     """Convert hex string or bytes to bytes, stripping 0x prefix if present."""
     if isinstance(address, str):
         return bytes.fromhex(address[2:] if address.startswith("0x") else address)

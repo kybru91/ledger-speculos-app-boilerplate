@@ -1,26 +1,27 @@
-from enum import IntEnum
-from typing import Generator, List, Optional
+from collections.abc import Generator
 from contextlib import contextmanager
+from enum import IntEnum
 
-from ragger.backend.interface import BackendInterface, RAPDU
+from ragger.backend.interface import RAPDU, BackendInterface
 from ragger.bip import pack_derivation_path
 from ragger.error import StatusWords
 
-from .tlv import format_tlv
 from .signing_partners import DYNAMIC_TOKEN_PARTNER
-
+from .tlv import format_tlv
 
 MAX_APDU_LEN: int = 255
 
 CLA: int = 0xE0
 
+
 class P1(IntEnum):
     # Parameter 1 for first APDU number.
     P1_START = 0x00
     # Parameter 1 for maximum APDU number.
-    P1_MAX   = 0x03
+    P1_MAX = 0x03
     # Parameter 1 for screen confirmation for GET_PUBLIC_KEY.
     P1_CONFIRM = 0x01
+
 
 class P2(IntEnum):
     # Parameter 2 for last APDU to receive.
@@ -28,19 +29,18 @@ class P2(IntEnum):
     # Parameter 2 for more APDU to receive.
     P2_MORE = 0x80
 
+
 class InsType(IntEnum):
-    GET_VERSION        = 0x03
-    GET_APP_NAME       = 0x04
-    GET_PUBLIC_KEY     = 0x05
-    SIGN_TX            = 0x06
-    SIGN_TOKEN_TX      = 0x07
+    GET_VERSION = 0x03
+    GET_APP_NAME = 0x04
+    GET_PUBLIC_KEY = 0x05
+    SIGN_TX = 0x06
+    SIGN_TOKEN_TX = 0x07
     PROVIDE_TOKEN_INFO = 0x22
 
+
 # Custom error codes specific to Boilerplate app
-custom_errors = {
-    "SW_INVALID_DYNAMIC_TOKEN": 0xB009,
-    "SW_SWAP_FAIL":             0xC000
-}
+custom_errors = {"SW_INVALID_DYNAMIC_TOKEN": 0xB009, "SW_SWAP_FAIL": 0xC000}
 
 # Build the combined dictionary first
 _errors_dict = {m.name: m.value for m in StatusWords}
@@ -50,8 +50,8 @@ _errors_dict.update(custom_errors)
 Errors = IntEnum("Errors", _errors_dict)  # type: ignore[misc]
 
 
-def split_message(message: bytes, max_size: int) -> List[bytes]:
-    return [message[x:x + max_size] for x in range(0, len(message), max_size)]
+def split_message(message: bytes, max_size: int) -> list[bytes]:
+    return [message[x : x + max_size] for x in range(0, len(message), max_size)]
 
 
 class BoilerplateCommandSender:
@@ -59,71 +59,58 @@ class BoilerplateCommandSender:
         self.backend = backend
 
     def get_app_and_version(self) -> RAPDU:
-        return self.backend.exchange(cla=0xB0,  # specific CLA for BOLOS
-                                     ins=0x01,  # specific INS for get_app_and_version
-                                     p1=P1.P1_START,
-                                     p2=P2.P2_LAST,
-                                     data=b"")
-
+        return self.backend.exchange(
+            cla=0xB0,  # specific CLA for BOLOS
+            ins=0x01,  # specific INS for get_app_and_version
+            p1=P1.P1_START,
+            p2=P2.P2_LAST,
+            data=b"",
+        )
 
     def get_version(self) -> RAPDU:
-        return self.backend.exchange(cla=CLA,
-                                     ins=InsType.GET_VERSION,
-                                     p1=P1.P1_START,
-                                     p2=P2.P2_LAST,
-                                     data=b"")
-
+        return self.backend.exchange(cla=CLA, ins=InsType.GET_VERSION, p1=P1.P1_START, p2=P2.P2_LAST, data=b"")
 
     def get_app_name(self) -> RAPDU:
-        return self.backend.exchange(cla=CLA,
-                                     ins=InsType.GET_APP_NAME,
-                                     p1=P1.P1_START,
-                                     p2=P2.P2_LAST,
-                                     data=b"")
-
+        return self.backend.exchange(cla=CLA, ins=InsType.GET_APP_NAME, p1=P1.P1_START, p2=P2.P2_LAST, data=b"")
 
     def get_public_key(self, path: str) -> RAPDU:
-        return self.backend.exchange(cla=CLA,
-                                     ins=InsType.GET_PUBLIC_KEY,
-                                     p1=P1.P1_START,
-                                     p2=P2.P2_LAST,
-                                     data=pack_derivation_path(path))
-
+        return self.backend.exchange(
+            cla=CLA,
+            ins=InsType.GET_PUBLIC_KEY,
+            p1=P1.P1_START,
+            p2=P2.P2_LAST,
+            data=pack_derivation_path(path),
+        )
 
     @contextmanager
     def get_public_key_with_confirmation(self, path: str) -> Generator[None, None, None]:
-        with self.backend.exchange_async(cla=CLA,
-                                         ins=InsType.GET_PUBLIC_KEY,
-                                         p1=P1.P1_CONFIRM,
-                                         p2=P2.P2_LAST,
-                                         data=pack_derivation_path(path)) as response:
+        with self.backend.exchange_async(
+            cla=CLA,
+            ins=InsType.GET_PUBLIC_KEY,
+            p1=P1.P1_CONFIRM,
+            p2=P2.P2_LAST,
+            data=pack_derivation_path(path),
+        ) as response:
             yield response
-
 
     @contextmanager
     def _sign_transaction(self, ins: InsType, path: str, transaction: bytes) -> Generator[None, None, None]:
         """Generic transaction signing handler (for SIGN_TX and SIGN_TOKEN_TX)."""
-        self.backend.exchange(cla=CLA,
-                              ins=ins,
-                              p1=P1.P1_START,
-                              p2=P2.P2_MORE,
-                              data=pack_derivation_path(path))
+        self.backend.exchange(
+            cla=CLA,
+            ins=ins,
+            p1=P1.P1_START,
+            p2=P2.P2_MORE,
+            data=pack_derivation_path(path),
+        )
         messages = split_message(transaction, MAX_APDU_LEN)
         idx: int = P1.P1_START + 1
 
         for msg in messages[:-1]:
-            self.backend.exchange(cla=CLA,
-                                  ins=ins,
-                                  p1=idx,
-                                  p2=P2.P2_MORE,
-                                  data=msg)
+            self.backend.exchange(cla=CLA, ins=ins, p1=idx, p2=P2.P2_MORE, data=msg)
             idx += 1
 
-        with self.backend.exchange_async(cla=CLA,
-                                         ins=ins,
-                                         p1=idx,
-                                         p2=P2.P2_LAST,
-                                         data=messages[-1]) as response:
+        with self.backend.exchange_async(cla=CLA, ins=ins, p1=idx, p2=P2.P2_LAST, data=messages[-1]) as response:
             yield response
 
     # sign_tx and sign_token_tx are async functions that send the transaction to the device
@@ -139,32 +126,28 @@ class BoilerplateCommandSender:
             yield response
 
     # Retrieve the last asynchronous response from the backend
-    def get_async_response(self) -> Optional[RAPDU]:
+    def get_async_response(self) -> RAPDU | None:
         return self.backend.last_async_response
 
     # Synchronous versions of sign_tx and sign_token_tx
     # These functions wait for the response after sending the transaction. They are particularly
     # useful for tests that do not require user interaction (e.g., when the transaction as already
     # been approved in the SWAP flow)
-    def sign_tx_sync(self, path: str, transaction: bytes) -> Optional[RAPDU]:
+    def sign_tx_sync(self, path: str, transaction: bytes) -> RAPDU | None:
         with self.sign_tx(path, transaction):
             pass
         rapdu = self.get_async_response()
         assert isinstance(rapdu, RAPDU)
         return rapdu
 
-    def sign_token_tx_sync(self, path: str, transaction: bytes) -> Optional[RAPDU]:
+    def sign_token_tx_sync(self, path: str, transaction: bytes) -> RAPDU | None:
         with self.sign_token_tx(path, transaction):
             pass
         rapdu = self.get_async_response()
         assert isinstance(rapdu, RAPDU)
         return rapdu
 
-    def provide_dynamic_token(self,
-                              ticker: str,
-                              decimals: int,
-                              token_address: bytes,
-                              chain_id: int = 0x8001) -> RAPDU:
+    def provide_dynamic_token(self, ticker: str, decimals: int, token_address: bytes, chain_id: int = 0x8001) -> RAPDU:
         """
         Provide a dynamic token descriptor signed with CAL test key.
 
@@ -198,8 +181,4 @@ class BoilerplateCommandSender:
         self.backend.exchange_raw(DYNAMIC_TOKEN_PARTNER.get_certificate_payload(self.backend.device.type))
 
         # Send APDU with P1=0, P2=0 (no chunking for token descriptors)
-        return self.backend.exchange(cla=CLA,
-                                     ins=InsType.PROVIDE_TOKEN_INFO,
-                                     p1=0x00,
-                                     p2=0x00,
-                                     data=payload)
+        return self.backend.exchange(cla=CLA, ins=InsType.PROVIDE_TOKEN_INFO, p1=0x00, p2=0x00, data=payload)

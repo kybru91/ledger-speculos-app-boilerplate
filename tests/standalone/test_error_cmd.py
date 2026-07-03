@@ -1,9 +1,8 @@
 import pytest
-
-from ragger.error import ExceptionRAPDU
 from ragger.backend.interface import BackendInterface
+from ragger.error import ExceptionRAPDU
 
-from application_client.boilerplate_command_sender import CLA, InsType, P1, P2, Errors
+from application_client.boilerplate_command_sender import CLA, P1, P2, Errors, InsType
 
 
 # Ensure the app returns an error when a bad CLA is used
@@ -16,7 +15,7 @@ def test_bad_cla(backend: BackendInterface) -> None:
 # Ensure the app returns an error when a bad INS is used
 def test_bad_ins(backend: BackendInterface) -> None:
     with pytest.raises(ExceptionRAPDU) as e:
-        backend.exchange(cla=CLA, ins=0xff)
+        backend.exchange(cla=CLA, ins=0xFF)
     assert e.value.status == Errors.SWO_INVALID_INS
 
 
@@ -51,9 +50,11 @@ def test_wrong_data_length(backend: BackendInterface) -> None:
 # Ensure there is no state confusion when trying wrong APDU sequences
 def test_invalid_state(backend: BackendInterface) -> None:
     with pytest.raises(ExceptionRAPDU) as e:
-        backend.exchange(cla=CLA,
-                         ins=InsType.SIGN_TX,
-                         p1=P1.P1_START + 1,  # Try to continue a flow instead of start a new one
-                         p2=P2.P2_MORE,
-                         data=b"abcde")  # data is not parsed in this case
+        backend.exchange(
+            cla=CLA,
+            ins=InsType.SIGN_TX,
+            p1=P1.P1_START + 1,  # Try to continue a flow instead of start a new one
+            p2=P2.P2_MORE,
+            data=b"abcde",
+        )  # data is not parsed in this case
     assert e.value.status == Errors.SWO_CONDITIONS_NOT_SATISFIED
