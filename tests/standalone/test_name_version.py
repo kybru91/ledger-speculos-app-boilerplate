@@ -5,7 +5,7 @@ from application_client.boilerplate_response_unpacker import (
     unpack_get_app_and_version_response,
 )
 
-from .utils import verify_version, verify_name
+from .utils import verify_name, verify_version
 
 
 # Test a specific APDU asking BOLOS (and not the app) the name and version of the current app

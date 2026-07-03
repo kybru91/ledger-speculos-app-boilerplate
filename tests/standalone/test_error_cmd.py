@@ -1,9 +1,8 @@
 import pytest
-
-from ragger.error import ExceptionRAPDU
 from ragger.backend.interface import BackendInterface
+from ragger.error import ExceptionRAPDU
 
-from application_client.boilerplate_command_sender import CLA, InsType, P1, P2, Errors
+from application_client.boilerplate_command_sender import CLA, P1, P2, Errors, InsType
 
 
 # Ensure the app returns an error when a bad CLA is used

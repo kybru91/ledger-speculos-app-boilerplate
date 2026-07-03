@@ -1,10 +1,8 @@
 import pytest
-
 from ragger.backend.interface import BackendInterface
 from ragger.error import ExceptionRAPDU
 from ragger.navigator.navigation_scenario import NavigateWithScenario
 
-from application_client.boilerplate_transaction import Transaction
 from application_client.boilerplate_command_sender import (
     BoilerplateCommandSender,
     Errors,
@@ -13,6 +11,8 @@ from application_client.boilerplate_response_unpacker import (
     unpack_get_public_key_response,
     unpack_sign_tx_response,
 )
+from application_client.boilerplate_transaction import Transaction
+
 from .utils import check_signature_validity
 
 # In this tests we check the behavior of the device when asked to sign a transaction

@@ -4,8 +4,9 @@ Each instance bundles: PEM key, cert usage, and per-device certificate hex data.
 """
 
 from pathlib import Path
+
 from ledgered.devices import DeviceType  # type: ignore[import-untyped]
-from ragger.pki import SigningPartner, CertificatePubKeyUsage
+from ragger.pki import CertificatePubKeyUsage, SigningPartner
 
 _KEYCHAIN_DIR = Path(__file__).parent / "keychain"
 

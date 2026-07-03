@@ -1,14 +1,13 @@
-from enum import IntEnum
-from typing import Generator, List, Optional
+from collections.abc import Generator
 from contextlib import contextmanager
+from enum import IntEnum
 
-from ragger.backend.interface import BackendInterface, RAPDU
+from ragger.backend.interface import RAPDU, BackendInterface
 from ragger.bip import pack_derivation_path
 from ragger.error import StatusWords
 
-from .tlv import format_tlv
 from .signing_partners import DYNAMIC_TOKEN_PARTNER
-
+from .tlv import format_tlv
 
 MAX_APDU_LEN: int = 255
 
@@ -51,7 +50,7 @@ _errors_dict.update(custom_errors)
 Errors = IntEnum("Errors", _errors_dict)  # type: ignore[misc]
 
 
-def split_message(message: bytes, max_size: int) -> List[bytes]:
+def split_message(message: bytes, max_size: int) -> list[bytes]:
     return [message[x : x + max_size] for x in range(0, len(message), max_size)]
 
 
@@ -141,21 +140,21 @@ class BoilerplateCommandSender:
             yield response
 
     # Retrieve the last asynchronous response from the backend
-    def get_async_response(self) -> Optional[RAPDU]:
+    def get_async_response(self) -> RAPDU | None:
         return self.backend.last_async_response
 
     # Synchronous versions of sign_tx and sign_token_tx
     # These functions wait for the response after sending the transaction. They are particularly
     # useful for tests that do not require user interaction (e.g., when the transaction as already
     # been approved in the SWAP flow)
-    def sign_tx_sync(self, path: str, transaction: bytes) -> Optional[RAPDU]:
+    def sign_tx_sync(self, path: str, transaction: bytes) -> RAPDU | None:
         with self.sign_tx(path, transaction):
             pass
         rapdu = self.get_async_response()
         assert isinstance(rapdu, RAPDU)
         return rapdu
 
-    def sign_token_tx_sync(self, path: str, transaction: bytes) -> Optional[RAPDU]:
+    def sign_token_tx_sync(self, path: str, transaction: bytes) -> RAPDU | None:
         with self.sign_token_tx(path, transaction):
             pass
         rapdu = self.get_async_response()

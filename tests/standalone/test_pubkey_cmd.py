@@ -1,8 +1,7 @@
 import pytest
-
-from ragger.bip import calculate_public_key_and_chaincode, CurveChoice
-from ragger.error import ExceptionRAPDU
 from ragger.backend.interface import BackendInterface
+from ragger.bip import CurveChoice, calculate_public_key_and_chaincode
+from ragger.error import ExceptionRAPDU
 from ragger.navigator.navigation_scenario import NavigateWithScenario
 
 from application_client.boilerplate_command_sender import (

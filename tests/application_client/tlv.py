@@ -1,4 +1,3 @@
-from typing import Union
 
 
 def der_encode(value: int) -> bytes:
@@ -21,7 +20,7 @@ def der_encode(value: int) -> bytes:
     return value_bytes
 
 
-def format_tlv(tag: int, value: Union[int, str, bytes]) -> bytes:
+def format_tlv(tag: int, value: int | str | bytes) -> bytes:
     """
     Format a TLV (Tag-Length-Value) entry for CAL dynamic token descriptor.
 

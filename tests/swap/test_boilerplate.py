@@ -1,19 +1,20 @@
 import pytest
 from ledger_app_clients.exchange.test_runner import (
-    ExchangeTestRunner,
     ALL_TESTS_EXCEPT_MEMO_THORSWAP_AND_FEES,
+    ExchangeTestRunner,
 )
 from ragger.error import ExceptionRAPDU
 
-from application_client.boilerplate_currency_utils import BOL_PATH
 from application_client.boilerplate_command_sender import (
     BoilerplateCommandSender,
+)
+from application_client.boilerplate_command_sender import (
     Errors as BoilerplateErrors,
 )
-from application_client.boilerplate_transaction import Transaction, TokenTransaction
+from application_client.boilerplate_currency_utils import BOL_PATH
+from application_client.boilerplate_transaction import TokenTransaction, Transaction
 
 from . import cal_helper as cal
-
 
 # Token addresses from the hardcoded database in src/token/token_db.c
 # USDC token with 12 decimals

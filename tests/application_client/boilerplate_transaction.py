@@ -1,13 +1,12 @@
 from io import BytesIO
-from typing import Union
 
 from .boilerplate_utils import (
+    UINT64_MAX,
+    parse_hex_address,
     read,
     read_uint,
     read_varint,
     write_varint,
-    UINT64_MAX,
-    parse_hex_address,
 )
 
 
@@ -17,7 +16,7 @@ class TransactionError(Exception):
 
 class Transaction:
     def __init__(
-        self, nonce: int, to: Union[str, bytes], value: int, memo: str
+        self, nonce: int, to: str | bytes, value: int, memo: str
     ) -> None:
         self.nonce: int = nonce
         self.to: bytes = parse_hex_address(to)
@@ -45,7 +44,7 @@ class Transaction:
         )
 
     @classmethod
-    def from_bytes(cls, hexa: Union[bytes, BytesIO]):
+    def from_bytes(cls, hexa: bytes | BytesIO):
         buf: BytesIO = BytesIO(hexa) if isinstance(hexa, bytes) else hexa
 
         nonce: int = read_uint(buf, 64, byteorder="big")
@@ -61,8 +60,8 @@ class TokenTransaction:
     def __init__(
         self,
         nonce: int,
-        to: Union[str, bytes],
-        token_address: Union[str, bytes],
+        to: str | bytes,
+        token_address: str | bytes,
         value: int,
         memo: str,
     ) -> None:
@@ -97,7 +96,7 @@ class TokenTransaction:
         )
 
     @classmethod
-    def from_bytes(cls, hexa: Union[bytes, BytesIO]):
+    def from_bytes(cls, hexa: bytes | BytesIO):
         buf: BytesIO = BytesIO(hexa) if isinstance(hexa, bytes) else hexa
 
         nonce: int = read_uint(buf, 64, byteorder="big")
