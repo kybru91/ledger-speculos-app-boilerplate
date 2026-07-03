@@ -8,20 +8,14 @@ from ecdsa.util import sigdecode_der
 
 
 # Check if a signature of a given message is valid
-def check_signature_validity(
-    public_key: bytes, signature: bytes, message: bytes
-) -> bool:
-    pk: VerifyingKey = VerifyingKey.from_string(
-        public_key, curve=SECP256k1, hashfunc=None
-    )
+def check_signature_validity(public_key: bytes, signature: bytes, message: bytes) -> bool:
+    pk: VerifyingKey = VerifyingKey.from_string(public_key, curve=SECP256k1, hashfunc=None)
     # Compute message hash (keccak_256)
     k = keccak.new(digest_bits=256)
     k.update(message)
     message_hash = k.digest()
 
-    return pk.verify_digest(
-        signature=signature, digest=message_hash, sigdecode=sigdecode_der
-    )
+    return pk.verify_digest(signature=signature, digest=message_hash, sigdecode=sigdecode_der)
 
 
 def verify_name(name: str) -> None:

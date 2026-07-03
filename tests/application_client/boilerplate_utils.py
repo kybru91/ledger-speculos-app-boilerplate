@@ -47,9 +47,7 @@ def read(buf: BytesIO, size: int) -> bytes:
     return b
 
 
-def read_uint(
-    buf: BytesIO, bit_len: int, byteorder: Literal["big", "little"] = "little"
-) -> int:
+def read_uint(buf: BytesIO, bit_len: int, byteorder: Literal["big", "little"] = "little") -> int:
     size: int = bit_len // 8
     b: bytes = buf.read(size)
 

@@ -68,14 +68,10 @@ class BoilerplateCommandSender:
         )
 
     def get_version(self) -> RAPDU:
-        return self.backend.exchange(
-            cla=CLA, ins=InsType.GET_VERSION, p1=P1.P1_START, p2=P2.P2_LAST, data=b""
-        )
+        return self.backend.exchange(cla=CLA, ins=InsType.GET_VERSION, p1=P1.P1_START, p2=P2.P2_LAST, data=b"")
 
     def get_app_name(self) -> RAPDU:
-        return self.backend.exchange(
-            cla=CLA, ins=InsType.GET_APP_NAME, p1=P1.P1_START, p2=P2.P2_LAST, data=b""
-        )
+        return self.backend.exchange(cla=CLA, ins=InsType.GET_APP_NAME, p1=P1.P1_START, p2=P2.P2_LAST, data=b"")
 
     def get_public_key(self, path: str) -> RAPDU:
         return self.backend.exchange(
@@ -87,9 +83,7 @@ class BoilerplateCommandSender:
         )
 
     @contextmanager
-    def get_public_key_with_confirmation(
-        self, path: str
-    ) -> Generator[None, None, None]:
+    def get_public_key_with_confirmation(self, path: str) -> Generator[None, None, None]:
         with self.backend.exchange_async(
             cla=CLA,
             ins=InsType.GET_PUBLIC_KEY,
@@ -100,9 +94,7 @@ class BoilerplateCommandSender:
             yield response
 
     @contextmanager
-    def _sign_transaction(
-        self, ins: InsType, path: str, transaction: bytes
-    ) -> Generator[None, None, None]:
+    def _sign_transaction(self, ins: InsType, path: str, transaction: bytes) -> Generator[None, None, None]:
         """Generic transaction signing handler (for SIGN_TX and SIGN_TOKEN_TX)."""
         self.backend.exchange(
             cla=CLA,
@@ -118,9 +110,7 @@ class BoilerplateCommandSender:
             self.backend.exchange(cla=CLA, ins=ins, p1=idx, p2=P2.P2_MORE, data=msg)
             idx += 1
 
-        with self.backend.exchange_async(
-            cla=CLA, ins=ins, p1=idx, p2=P2.P2_LAST, data=messages[-1]
-        ) as response:
+        with self.backend.exchange_async(cla=CLA, ins=ins, p1=idx, p2=P2.P2_LAST, data=messages[-1]) as response:
             yield response
 
     # sign_tx and sign_token_tx are async functions that send the transaction to the device
@@ -131,12 +121,8 @@ class BoilerplateCommandSender:
             yield response
 
     @contextmanager
-    def sign_token_tx(
-        self, path: str, transaction: bytes
-    ) -> Generator[None, None, None]:
-        with self._sign_transaction(
-            InsType.SIGN_TOKEN_TX, path, transaction
-        ) as response:
+    def sign_token_tx(self, path: str, transaction: bytes) -> Generator[None, None, None]:
+        with self._sign_transaction(InsType.SIGN_TOKEN_TX, path, transaction) as response:
             yield response
 
     # Retrieve the last asynchronous response from the backend
@@ -161,9 +147,7 @@ class BoilerplateCommandSender:
         assert isinstance(rapdu, RAPDU)
         return rapdu
 
-    def provide_dynamic_token(
-        self, ticker: str, decimals: int, token_address: bytes, chain_id: int = 0x8001
-    ) -> RAPDU:
+    def provide_dynamic_token(self, ticker: str, decimals: int, token_address: bytes, chain_id: int = 0x8001) -> RAPDU:
         """
         Provide a dynamic token descriptor signed with CAL test key.
 
@@ -176,9 +160,7 @@ class BoilerplateCommandSender:
         Returns:
             RAPDU response from the device
         """
-        assert len(token_address) == 32, (
-            f"Token address must be 32 bytes, got {len(token_address)}"
-        )
+        assert len(token_address) == 32, f"Token address must be 32 bytes, got {len(token_address)}"
 
         # Build TUID sub-TLV: tag 0x10 with 32-byte address (Boilerplate specific example)
         tuid = format_tlv(0x10, token_address)
@@ -196,11 +178,7 @@ class BoilerplateCommandSender:
         payload += format_tlv(0x08, DYNAMIC_TOKEN_PARTNER.sign(payload))  # SIGNATURE
 
         # Before sending the mock CAL descriptor, we need to onboard our mock CAL using a PKI certificate
-        self.backend.exchange_raw(
-            DYNAMIC_TOKEN_PARTNER.get_certificate_payload(self.backend.device.type)
-        )
+        self.backend.exchange_raw(DYNAMIC_TOKEN_PARTNER.get_certificate_payload(self.backend.device.type))
 
         # Send APDU with P1=0, P2=0 (no chunking for token descriptors)
-        return self.backend.exchange(
-            cla=CLA, ins=InsType.PROVIDE_TOKEN_INFO, p1=0x00, p2=0x00, data=payload
-        )
+        return self.backend.exchange(cla=CLA, ins=InsType.PROVIDE_TOKEN_INFO, p1=0x00, p2=0x00, data=payload)

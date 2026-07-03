@@ -27,17 +27,13 @@ def test_get_public_key_no_confirm(backend: BackendInterface) -> None:
         response = client.get_public_key(path=path).data
         _, public_key, _, chain_code = unpack_get_public_key_response(response)
 
-        ref_public_key, ref_chain_code = calculate_public_key_and_chaincode(
-            CurveChoice.Secp256k1, path=path
-        )
+        ref_public_key, ref_chain_code = calculate_public_key_and_chaincode(CurveChoice.Secp256k1, path=path)
         assert public_key.hex() == ref_public_key
         assert chain_code.hex() == ref_chain_code
 
 
 # In this test we check that the GET_PUBLIC_KEY works in confirmation mode
-def test_get_public_key_confirm_accepted(
-    backend: BackendInterface, scenario_navigator: NavigateWithScenario
-) -> None:
+def test_get_public_key_confirm_accepted(backend: BackendInterface, scenario_navigator: NavigateWithScenario) -> None:
     client = BoilerplateCommandSender(backend)
     path = "m/44'/1'/0'/0/0"
     with client.get_public_key_with_confirmation(path=path):
@@ -46,17 +42,13 @@ def test_get_public_key_confirm_accepted(
     response = client.get_async_response().data
     _, public_key, _, chain_code = unpack_get_public_key_response(response)
 
-    ref_public_key, ref_chain_code = calculate_public_key_and_chaincode(
-        CurveChoice.Secp256k1, path=path
-    )
+    ref_public_key, ref_chain_code = calculate_public_key_and_chaincode(CurveChoice.Secp256k1, path=path)
     assert public_key.hex() == ref_public_key
     assert chain_code.hex() == ref_chain_code
 
 
 # In this test we check that the GET_PUBLIC_KEY in confirmation mode replies an error if the user refuses
-def test_get_public_key_confirm_refused(
-    backend: BackendInterface, scenario_navigator: NavigateWithScenario
-) -> None:
+def test_get_public_key_confirm_refused(backend: BackendInterface, scenario_navigator: NavigateWithScenario) -> None:
     client = BoilerplateCommandSender(backend)
     path = "m/44'/1'/0'/0/0"
 

@@ -36,9 +36,7 @@ DEVICES_CONF = {
 }
 
 
-def run_cmd(
-    cmd: str, cwd: Path = Path("."), print_output: bool = False, no_throw: bool = False
-) -> str:
+def run_cmd(cmd: str, cwd: Path = Path("."), print_output: bool = False, no_throw: bool = False) -> str:
 
     print(f"[run_cmd] Running: '{cmd}'' inside '{cwd}'")
 

@@ -20,9 +20,7 @@ from . import cal_helper as cal
 # USDC token with 12 decimals
 TOKEN_USDC_ADDRESS = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
 TOKEN_LINK_ADDRESS = "ffeeddccbbaa99887766554433221100ffeeddccbbaa99887766554433221100"
-UNKNOWN_TOKEN_ADDRESS = (
-    "00ffeeddccbbaa99887766554433221100ffeeddccbbaa998877665544332211"
-)
+UNKNOWN_TOKEN_ADDRESS = "00ffeeddccbbaa99887766554433221100ffeeddccbbaa998877665544332211"
 
 # CAL dynamic token address (not in hardcoded database, will be provided dynamically)
 TOKEN_DYNAMIC_USDT_ADDRESS = cal.TOKEN_DYNAMIC_USDT_ADDRESS
@@ -69,14 +67,10 @@ class BoilerplateTests(ExchangeTestRunner):
     # This function will be called by the ExchangeTestRunner in a callback like way
     def perform_final_tx(self, destination, send_amount, fees, memo):
         # Create the transaction that will be sent to the device for signing
-        tx = Transaction(
-            nonce=1, to=destination, value=send_amount, memo=memo
-        ).serialize()
+        tx = Transaction(nonce=1, to=destination, value=send_amount, memo=memo).serialize()
 
         # Send the TX
-        BoilerplateCommandSender(self.backend).sign_tx_sync(
-            path=BOL_PATH, transaction=tx
-        )
+        BoilerplateCommandSender(self.backend).sign_tx_sync(path=BOL_PATH, transaction=tx)
 
         # TODO : assert signature validity. Not required but recommended
 
@@ -85,14 +79,10 @@ class BoilerplateTests(ExchangeTestRunner):
 # USDC token with 12 decimals
 TOKEN_USDC_ADDRESS = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
 TOKEN_LINK_ADDRESS = "ffeeddccbbaa99887766554433221100ffeeddccbbaa99887766554433221100"
-UNKNOWN_TOKEN_ADDRESS = (
-    "00ffeeddccbbaa99887766554433221100ffeeddccbbaa998877665544332211"
-)
+UNKNOWN_TOKEN_ADDRESS = "00ffeeddccbbaa99887766554433221100ffeeddccbbaa998877665544332211"
 
 # CAL dynamic token address (not in hardcoded database, will be provided dynamically)
-TOKEN_DYNAMIC_USDT_ADDRESS = (
-    "cafebabedeadbeefcafebabedeadbeefcafebabedeadbeefcafebabedeadbeef"
-)
+TOKEN_DYNAMIC_USDT_ADDRESS = "cafebabedeadbeefcafebabedeadbeefcafebabedeadbeefcafebabedeadbeef"
 
 
 # ExchangeTestRunner implementation for Boilerplate Token Swap.
@@ -101,9 +91,7 @@ class BoilerplateTokenTests(BoilerplateTests):
     # Token currency configuration - USDC with 12 decimals as defined in token_db.c
     currency_configuration = cal.BOL_USDC_CURRENCY_CONFIGURATION
 
-    def _perform_final_tx_with_token(
-        self, destination, send_amount, fees, memo, token_address
-    ):
+    def _perform_final_tx_with_token(self, destination, send_amount, fees, memo, token_address):
         # Create the token transaction that will be sent to the device for signing
         tx = TokenTransaction(
             nonce=1,
@@ -114,27 +102,19 @@ class BoilerplateTokenTests(BoilerplateTests):
         ).serialize()
 
         # Send the token TX
-        BoilerplateCommandSender(self.backend).sign_token_tx_sync(
-            path=BOL_PATH, transaction=tx
-        )
+        BoilerplateCommandSender(self.backend).sign_token_tx_sync(path=BOL_PATH, transaction=tx)
 
         # TODO : assert signature validity. Not required but recommended
 
     def perform_final_tx(self, destination, send_amount, fees, memo):
         # Matching the BOL_USDC_CURRENCY_CONFIGURATION provided earlier
-        self._perform_final_tx_with_token(
-            destination, send_amount, fees, memo, TOKEN_USDC_ADDRESS
-        )
+        self._perform_final_tx_with_token(destination, send_amount, fees, memo, TOKEN_USDC_ADDRESS)
 
     def perform_final_tx_token_mismatch(self, destination, send_amount, fees, memo):
-        self._perform_final_tx_with_token(
-            destination, send_amount, fees, memo, TOKEN_LINK_ADDRESS
-        )
+        self._perform_final_tx_with_token(destination, send_amount, fees, memo, TOKEN_LINK_ADDRESS)
 
     def perform_final_tx_token_unknown(self, destination, send_amount, fees, memo):
-        self._perform_final_tx_with_token(
-            destination, send_amount, fees, memo, UNKNOWN_TOKEN_ADDRESS
-        )
+        self._perform_final_tx_with_token(destination, send_amount, fees, memo, UNKNOWN_TOKEN_ADDRESS)
 
 
 # We use a class to reuse the same Speculos instance (faster performances)
@@ -160,9 +140,7 @@ class TestsBoilerplate:
             "perform_final_tx_token_unknown",
         ],
     )
-    def test_boilerplate_token_issues(
-        self, backend, exchange_navigation_helper, fault_test_to_run
-    ):
+    def test_boilerplate_token_issues(self, backend, exchange_navigation_helper, fault_test_to_run):
         with pytest.raises(ExceptionRAPDU) as e:
             test_class = BoilerplateTokenTests(backend, exchange_navigation_helper)
             test_class.perform_final_tx = getattr(test_class, fault_test_to_run)
@@ -195,17 +173,11 @@ class BoilerplateDynamicTokenTests(BoilerplateTokenTests):
         client = BoilerplateCommandSender(self.backend)
         token_address = bytes.fromhex(token_address_hex)
 
-        rapdu = client.provide_dynamic_token(
-            ticker=ticker, decimals=decimals, token_address=token_address
-        )
-        assert rapdu.status == 0x9000, (
-            f"Failed to provide dynamic token: {hex(rapdu.status)}"
-        )
+        rapdu = client.provide_dynamic_token(ticker=ticker, decimals=decimals, token_address=token_address)
+        assert rapdu.status == 0x9000, f"Failed to provide dynamic token: {hex(rapdu.status)}"
 
         # Now perform the token transaction with the dynamically provided token
-        self._perform_final_tx_with_token(
-            destination, send_amount, fees, memo, token_address_hex
-        )
+        self._perform_final_tx_with_token(destination, send_amount, fees, memo, token_address_hex)
 
     def perform_final_tx(self, destination, send_amount, fees, memo):
         # Matching the BOL_DYNAMIC_USDT_CURRENCY_CONFIGURATION provided earlier
@@ -236,13 +208,9 @@ class BoilerplateDynamicTokenTests(BoilerplateTokenTests):
         # Let's call the parent method directly with wrong address
         client = BoilerplateCommandSender(self.backend)
         wrong_token_address = bytes.fromhex(TOKEN_LINK_ADDRESS)
-        client.provide_dynamic_token(
-            ticker="WRONG", decimals=6, token_address=wrong_token_address
-        )
+        client.provide_dynamic_token(ticker="WRONG", decimals=6, token_address=wrong_token_address)
         # But use different address in transaction
-        self._perform_final_tx_with_token(
-            destination, send_amount, fees, memo, TOKEN_DYNAMIC_USDT_ADDRESS
-        )
+        self._perform_final_tx_with_token(destination, send_amount, fees, memo, TOKEN_DYNAMIC_USDT_ADDRESS)
 
     def perform_final_tx_override_hardcoded(self, destination, send_amount, fees, memo):
         """Provide dynamic token with USDC address but different metadata."""
@@ -259,16 +227,12 @@ class BoilerplateDynamicTokenTests(BoilerplateTokenTests):
     def perform_final_tx_no_provision(self, destination, send_amount, fees, memo):
         """Skip providing dynamic token - go straight to transaction."""
         # Don't provide dynamic token - just do the transaction
-        self._perform_final_tx_with_token(
-            destination, send_amount, fees, memo, TOKEN_DYNAMIC_USDT_ADDRESS
-        )
+        self._perform_final_tx_with_token(destination, send_amount, fees, memo, TOKEN_DYNAMIC_USDT_ADDRESS)
 
     def perform_final_tx_reuse(self, destination, send_amount, fees, memo):
         """Reuse dynamic token without re-providing (test persistence)."""
         # Skip providing token again - rely on persistence from previous call
-        self._perform_final_tx_with_token(
-            destination, send_amount, fees, memo, TOKEN_DYNAMIC_USDT_ADDRESS
-        )
+        self._perform_final_tx_with_token(destination, send_amount, fees, memo, TOKEN_DYNAMIC_USDT_ADDRESS)
 
     def perform_final_tx_wrong_decimals(self, destination, send_amount, fees, memo):
         """Provide dynamic token with decimals that don't match SWAP config."""
@@ -288,18 +252,12 @@ class TestsBoilerplateDynamic:
     """Tests for CAL dynamic token swap functionality."""
 
     @pytest.mark.parametrize("test_to_run", ALL_TESTS_EXCEPT_MEMO_THORSWAP_AND_FEES)
-    def test_boilerplate_dynamic_token(
-        self, backend, exchange_navigation_helper, test_to_run
-    ):
+    def test_boilerplate_dynamic_token(self, backend, exchange_navigation_helper, test_to_run):
         """Test SWAP with CAL-provided dynamic token (USDT with 6 decimals)."""
         # Call run_test method of ExchangeTestRunner with dynamic token configuration
-        BoilerplateDynamicTokenTests(backend, exchange_navigation_helper).run_test(
-            test_to_run
-        )
+        BoilerplateDynamicTokenTests(backend, exchange_navigation_helper).run_test(test_to_run)
 
-    def test_boilerplate_dynamic_token_wrong_address(
-        self, backend, exchange_navigation_helper
-    ):
+    def test_boilerplate_dynamic_token_wrong_address(self, backend, exchange_navigation_helper):
         """Test SWAP fails when dynamic token address doesn't match transaction token address."""
         test_class = BoilerplateDynamicTokenTests(backend, exchange_navigation_helper)
         test_class.perform_final_tx = test_class.perform_final_tx_with_wrong_address
@@ -308,9 +266,7 @@ class TestsBoilerplateDynamic:
             test_class.run_test("swap_valid_1")
         assert e.value.status == BoilerplateErrors.SW_SWAP_FAIL
 
-    def test_boilerplate_dynamic_token_override_hardcoded(
-        self, backend, exchange_navigation_helper
-    ):
+    def test_boilerplate_dynamic_token_override_hardcoded(self, backend, exchange_navigation_helper):
         """Test SWAP with dynamic token that overrides a hardcoded token (same address, different metadata)."""
         test_class = BoilerplateDynamicTokenTests(backend, exchange_navigation_helper)
         test_class.perform_final_tx = test_class.perform_final_tx_override_hardcoded
@@ -318,9 +274,7 @@ class TestsBoilerplateDynamic:
         # This should succeed - dynamic token (CUSD, 6 decimals) overrides hardcoded USDC (12 decimals)
         test_class.run_test("swap_valid_1")
 
-    def test_boilerplate_dynamic_token_no_provision(
-        self, backend, exchange_navigation_helper
-    ):
+    def test_boilerplate_dynamic_token_no_provision(self, backend, exchange_navigation_helper):
         """Test SWAP fails when trying to use dynamic token address without providing it first."""
         test_class = BoilerplateDynamicTokenTests(backend, exchange_navigation_helper)
         test_class.perform_final_tx = test_class.perform_final_tx_no_provision
@@ -330,9 +284,7 @@ class TestsBoilerplateDynamic:
         # Should fail because token address is unknown (not in hardcoded DB and not provided dynamically)
         assert e.value.status == BoilerplateErrors.SW_SWAP_FAIL
 
-    def test_boilerplate_dynamic_token_wrong_decimals_amount(
-        self, backend, exchange_navigation_helper
-    ):
+    def test_boilerplate_dynamic_token_wrong_decimals_amount(self, backend, exchange_navigation_helper):
         """Test SWAP with dynamic token but wrong decimals in currency configuration."""
         test_class = BoilerplateDynamicTokenTests(backend, exchange_navigation_helper)
         test_class.perform_final_tx = test_class.perform_final_tx_wrong_decimals

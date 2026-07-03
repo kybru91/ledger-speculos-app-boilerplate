@@ -118,9 +118,7 @@ def test_sign_token_tx_unknown_token(backend: BackendInterface) -> None:
 
 
 # Test signing a token transaction and refusing it
-def test_sign_token_tx_refused(
-    backend: BackendInterface, scenario_navigator: NavigateWithScenario
-) -> None:
+def test_sign_token_tx_refused(backend: BackendInterface, scenario_navigator: NavigateWithScenario) -> None:
     # Use the app interface instead of raw interface
     client = BoilerplateCommandSender(backend)
 
@@ -142,9 +140,7 @@ def test_sign_token_tx_refused(
 
 
 # Test signing a token transaction with a long memo (multi-chunk)
-def test_sign_token_tx_long_memo(
-    backend: BackendInterface, scenario_navigator: NavigateWithScenario
-) -> None:
+def test_sign_token_tx_long_memo(backend: BackendInterface, scenario_navigator: NavigateWithScenario) -> None:
     # Use the app interface instead of raw interface
     client = BoilerplateCommandSender(backend)
 
@@ -181,9 +177,7 @@ def test_sign_token_tx_long_memo(
 
 
 # Test providing a valid dynamic token via CAL and signing with it
-def test_provide_dynamic_token_valid_new(
-    backend: BackendInterface, scenario_navigator: NavigateWithScenario
-) -> None:
+def test_provide_dynamic_token_valid_new(backend: BackendInterface, scenario_navigator: NavigateWithScenario) -> None:
     """Test providing a new CAL-signed token and using it to sign a transaction."""
     client = BoilerplateCommandSender(backend)
 
@@ -193,9 +187,7 @@ def test_provide_dynamic_token_valid_new(
 
     # Provide dynamic token via CAL (ticker, decimals, 32-byte address)
     token_address = bytes.fromhex(TOKEN_CAL_DYNAMIC)
-    rapdu = client.provide_dynamic_token(
-        ticker="USDT", decimals=6, token_address=token_address
-    )
+    rapdu = client.provide_dynamic_token(ticker="USDT", decimals=6, token_address=token_address)
 
     # Now sign a transaction using the dynamically provided token
     transaction = TokenTransaction(
@@ -305,9 +297,7 @@ def test_provide_dynamic_token_missing_tuid(backend: BackendInterface) -> None:
     tlv_with_sig += format_tlv(0x08, app_data)
 
     with pytest.raises(ExceptionRAPDU) as e:
-        backend.exchange(
-            cla=CLA, ins=InsType.PROVIDE_TOKEN_INFO, p1=0x00, p2=0x00, data=tlv_with_sig
-        )
+        backend.exchange(cla=CLA, ins=InsType.PROVIDE_TOKEN_INFO, p1=0x00, p2=0x00, data=tlv_with_sig)
 
     # Should fail with INVALID_DYNAMIC_TOKEN
     assert e.value.status == Errors.SW_INVALID_DYNAMIC_TOKEN
@@ -347,9 +337,7 @@ def test_provide_dynamic_token_unknown_tuid_tag(backend: BackendInterface) -> No
     tlv_with_sig += format_tlv(0x08, app_data)
 
     with pytest.raises(ExceptionRAPDU) as e:
-        backend.exchange(
-            cla=CLA, ins=InsType.PROVIDE_TOKEN_INFO, p1=0x00, p2=0x00, data=tlv_with_sig
-        )
+        backend.exchange(cla=CLA, ins=InsType.PROVIDE_TOKEN_INFO, p1=0x00, p2=0x00, data=tlv_with_sig)
 
     # Should fail with INVALID_DYNAMIC_TOKEN due to strict TUID validation
     assert e.value.status == Errors.SW_INVALID_DYNAMIC_TOKEN
@@ -367,9 +355,7 @@ def test_provide_dynamic_token_persist_across_regular_tx(
 
     # Provide dynamic token
     token_address = bytes.fromhex(TOKEN_CAL_DYNAMIC)
-    rapdu = client.provide_dynamic_token(
-        ticker="USDT", decimals=6, token_address=token_address
-    )
+    rapdu = client.provide_dynamic_token(ticker="USDT", decimals=6, token_address=token_address)
 
     # Sign a regular transaction (not a token transaction)
     from application_client.boilerplate_transaction import Transaction
@@ -422,17 +408,11 @@ def test_provide_dynamic_token_multiple_sequential(
 
     # Provide first dynamic token
     token_address_1 = bytes.fromhex(TOKEN_CAL_DYNAMIC)
-    client.provide_dynamic_token(
-        ticker="TOK1", decimals=6, token_address=token_address_1
-    )
+    client.provide_dynamic_token(ticker="TOK1", decimals=6, token_address=token_address_1)
 
     # Provide second dynamic token with different address (should replace first)
-    token_address_2 = bytes.fromhex(
-        "1111111111111111111111111111111111111111111111111111111111111111"
-    )
-    client.provide_dynamic_token(
-        ticker="TOK2", decimals=8, token_address=token_address_2
-    )
+    token_address_2 = bytes.fromhex("1111111111111111111111111111111111111111111111111111111111111111")
+    client.provide_dynamic_token(ticker="TOK2", decimals=8, token_address=token_address_2)
 
     # Transaction with second token address should work
     transaction = TokenTransaction(
@@ -479,9 +459,7 @@ def test_provide_dynamic_token_max_ticker_length(
     token_address = bytes.fromhex(TOKEN_CAL_DYNAMIC)
     long_ticker = "A" * 12  # 12 chars - reasonable length that fits in MAX_TICKER_SIZE
 
-    rapdu = client.provide_dynamic_token(
-        ticker=long_ticker, decimals=6, token_address=token_address
-    )
+    rapdu = client.provide_dynamic_token(ticker=long_ticker, decimals=6, token_address=token_address)
     assert rapdu.status == 0x9000
 
     # Sign transaction to verify it works
@@ -513,9 +491,7 @@ def test_provide_dynamic_token_zero_decimals(
 
     # Provide dynamic token with 0 decimals (like some NFT tokens)
     token_address = bytes.fromhex(TOKEN_CAL_DYNAMIC)
-    rapdu = client.provide_dynamic_token(
-        ticker="NFT", decimals=0, token_address=token_address
-    )
+    rapdu = client.provide_dynamic_token(ticker="NFT", decimals=0, token_address=token_address)
     assert rapdu.status == 0x9000
 
     # Sign transaction with integer value (no decimals)
@@ -558,9 +534,7 @@ def test_provide_dynamic_token_wrong_tuid_size(backend: BackendInterface) -> Non
     payload += format_tlv(0x08, signature)  # SIGNATURE
 
     with pytest.raises(ExceptionRAPDU) as e:
-        backend.exchange(
-            cla=CLA, ins=InsType.PROVIDE_TOKEN_INFO, p1=0x00, p2=0x00, data=payload
-        )
+        backend.exchange(cla=CLA, ins=InsType.PROVIDE_TOKEN_INFO, p1=0x00, p2=0x00, data=payload)
 
     # Should fail with INVALID_DYNAMIC_TOKEN
     assert e.value.status == Errors.SW_INVALID_DYNAMIC_TOKEN

@@ -15,9 +15,7 @@ class TransactionError(Exception):
 
 
 class Transaction:
-    def __init__(
-        self, nonce: int, to: str | bytes, value: int, memo: str
-    ) -> None:
+    def __init__(self, nonce: int, to: str | bytes, value: int, memo: str) -> None:
         self.nonce: int = nonce
         self.to: bytes = parse_hex_address(to)
         self.value: int = value
@@ -106,6 +104,4 @@ class TokenTransaction:
         memo_len: int = read_varint(buf)
         memo: str = read(buf, memo_len).decode("ascii")
 
-        return cls(
-            nonce=nonce, to=to, token_address=token_address, value=value, memo=memo
-        )
+        return cls(nonce=nonce, to=to, token_address=token_address, value=value, memo=memo)

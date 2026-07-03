@@ -21,9 +21,7 @@ from .utils import check_signature_validity
 # In this test we send to the device a transaction to sign and validate it on screen
 # The transaction is short and will be sent in one chunk
 # We will ensure that the displayed information is correct by using screenshots comparison
-def test_sign_tx_short_tx(
-    backend: BackendInterface, scenario_navigator: NavigateWithScenario
-) -> None:
+def test_sign_tx_short_tx(backend: BackendInterface, scenario_navigator: NavigateWithScenario) -> None:
     # Use the app interface instead of raw interface
     client = BoilerplateCommandSender(backend)
     # The path used for this entire test
@@ -57,9 +55,7 @@ def test_sign_tx_short_tx(
 # In this test we send to the device a transaction to trig a blind-signing flow
 # The transaction is short and will be sent in one chunk
 # We will ensure that the displayed information is correct by using screenshots comparison
-def test_sign_tx_short_tx_blind_sign(
-    backend: BackendInterface, scenario_navigator: NavigateWithScenario
-) -> None:
+def test_sign_tx_short_tx_blind_sign(backend: BackendInterface, scenario_navigator: NavigateWithScenario) -> None:
     # Use the app interface instead of raw interface
     client = BoilerplateCommandSender(backend)
     # The path used for this entire test
@@ -92,9 +88,7 @@ def test_sign_tx_short_tx_blind_sign(
 # In this test se send to the device a transaction to sign and validate it on screen
 # This test is mostly the same as the previous one but with different values.
 # In particular the long memo will force the transaction to be sent in multiple chunks
-def test_sign_tx_long_tx(
-    backend: BackendInterface, scenario_navigator: NavigateWithScenario
-) -> None:
+def test_sign_tx_long_tx(backend: BackendInterface, scenario_navigator: NavigateWithScenario) -> None:
     # Use the app interface instead of raw interface
     client = BoilerplateCommandSender(backend)
     path: str = "m/44'/1'/0'/0/0"
@@ -125,9 +119,7 @@ def test_sign_tx_long_tx(
 
 # Transaction signature refused test
 # The test will ask for a transaction signature that will be refused on screen
-def test_sign_tx_refused(
-    backend: BackendInterface, scenario_navigator: NavigateWithScenario
-) -> None:
+def test_sign_tx_refused(backend: BackendInterface, scenario_navigator: NavigateWithScenario) -> None:
     # Use the app interface instead of raw interface
     client = BoilerplateCommandSender(backend)
     path: str = "m/44'/1'/0'/0/0"

@@ -1,5 +1,3 @@
-
-
 def der_encode(value: int) -> bytes:
     """
     Encode an integer using DER encoding for TLV tags and lengths.
